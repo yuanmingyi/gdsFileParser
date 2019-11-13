@@ -83,7 +83,7 @@ namespace gdsfp
         virtual void onParsedPropertyNumber(unsigned short propNum) = 0;
         virtual void onParsedNodeType(unsigned short nodeType) = 0;
         virtual void onParsedBoxType(unsigned short boxType) = 0;
-
+        virtual void onError(const char* error) = 0;
     private:
         void readString(std::stringstream *input, std::string *str);
         void readTimeStamp(std::stringstream *input, short *year, short *month,

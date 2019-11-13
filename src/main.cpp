@@ -180,6 +180,9 @@ protected:
     virtual void onParsedBoxType(unsigned short boxType) {
         cout << "Box Type: " << boxType << endl;
     };
+    virtual void onError(const char* error) {
+        cerr << error << endl;
+    }
 };
 
 

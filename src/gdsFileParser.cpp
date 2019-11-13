@@ -280,8 +280,8 @@ namespace gdsfp
         input->seekp(0, ios::end);
         unsigned int length = input->tellp();
         int count = length/8;
-        int x[count];
-        int y[count];
+        int *x = new int[count];
+        int *y = new int[count];
 
         for(int i=0; i<count; ++i) {
             x[i] = readInt(input);
@@ -289,6 +289,8 @@ namespace gdsfp
         }
 
         onParsedXY(count, x, y);
+        delete[] x;
+        delete[] y;
     }
 
     void gdsFileParser::readLayer(stringstream *input)
@@ -371,6 +373,8 @@ namespace gdsfp
     void gdsFileParser::parseBuffer(stringstream *input)
     {
         char recType, dataType;
+        char error[256] = "Unknown rec type: ";
+        char typeBuf[4];
         input->read(&recType, sizeof(recType));
         input->read(&dataType, sizeof(dataType));
 
@@ -448,6 +452,9 @@ namespace gdsfp
             case BOXTYPE:       readBoxType(input);             break;
 
             default:
+                _itoa_s(recType, typeBuf, 10);
+                strcat_s(error, typeBuf);
+                onError(error);
                 break;
         }
     }
@@ -469,11 +476,12 @@ namespace gdsfp
                 }
 
                 short sub = sizeof(length);
-                char buffer[length - sub];
+                char *buffer = new char[length - sub];
                 gdsFile.read((char *)&buffer, sizeof(buffer));
                 total += length;
                 stream.write(buffer, length - sub);
                 parseBuffer(&stream);
+                delete[] buffer;
             } while(gdsFile.good());
         } else {
             cerr << "Error: something is wrong with the file." << endl;
