@@ -280,8 +280,8 @@ namespace gdsfp
         input->seekp(0, ios::end);
         unsigned int length = input->tellp();
         int count = length/8;
-        int x[count];
-        int y[count];
+        int* x = new int[count];
+        int* y = new int[count];
 
         for(int i=0; i<count; ++i) {
             x[i] = readInt(input);
@@ -289,6 +289,8 @@ namespace gdsfp
         }
 
         onParsedXY(count, x, y);
+        delete[] x;
+        delete[] y;
     }
 
     void gdsFileParser::readLayer(stringstream *input)
@@ -455,7 +457,8 @@ namespace gdsfp
     int gdsFileParser::parse(const char *filePath)
     {
         std::ifstream gdsFile(filePath, ios::in | ios::binary);
-
+        short sub = sizeof(unsigned short);
+        char* buffer = NULL;
         if(gdsFile.is_open()) {
             stringstream stream(ios::in | ios::out | ios::binary);
             unsigned int total = 0;
@@ -468,12 +471,12 @@ namespace gdsfp
                     break;  // We have reached the end of the file.
                 }
 
-                short sub = sizeof(length);
-                char buffer[length - sub];
-                gdsFile.read((char *)&buffer, sizeof(buffer));
+                buffer = new char[length - sub];
+                gdsFile.read(buffer, length - sub);
                 total += length;
                 stream.write(buffer, length - sub);
                 parseBuffer(&stream);
+                delete[] buffer;
             } while(gdsFile.good());
         } else {
             cerr << "Error: something is wrong with the file." << endl;
