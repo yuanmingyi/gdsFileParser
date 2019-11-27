@@ -109,7 +109,13 @@ protected:
         cout << "PathType: " << pathType << endl;
     };
     virtual void onParsedStrans(short strans) {
-        cout << "Strans: " << strans << endl;
+        cout << "Strans: ";
+        for (int i = 0; i < 16; i++)
+        {
+            cout << (strans & 1);
+            strans >>= 1;
+        }
+        cout << endl;
     };
     virtual void onParsedPresentation(short font, short valign,
                                       short halign) {
